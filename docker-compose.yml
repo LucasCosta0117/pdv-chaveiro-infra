@@ -1,0 +1,25 @@
+services:
+# 1. SERVIÇO DO BANCO DE DADOS
+  db:
+    image: postgres:15-alpine
+    container_name: izi_db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASS}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - izi_network
+
+volumes:
+  pgdata:
+    name: izi_pgdata
+
+networks:
+  izi_network:
+    name: izi_bridge
+    driver: bridge
