@@ -40,6 +40,19 @@ services:
       - db # O Java só sobe depois que o banco estiver rodando
     networks:
       - izi_network
+# 3. SERVIÇO DO FRONT-END
+  frontend:
+    build:
+      context: ../izi-pdv-front
+      dockerfile: Dockerfile
+    container_name: izi_frontend
+    restart: unless-stopped
+    ports:
+      - "80:80" # Mapeia a porta 80 do Nginx para a porta 80 local
+    depends_on:
+      - backend
+    networks:
+      - izi_network
 
 volumes:
   pgdata:
