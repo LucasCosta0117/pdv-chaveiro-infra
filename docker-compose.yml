@@ -14,6 +14,32 @@ services:
       - pgdata:/var/lib/postgresql/data
     networks:
       - izi_network
+# 2. SERVIÇO DO BACK-END
+  backend:
+    build:
+      # Diz ao Docker para "voltar uma pasta" e procurar o Dockerfile no repositório do back-end
+      context: ../izi-pdv-back
+      dockerfile: Dockerfile
+    container_name: izi_backend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      # Variáveis injetadas no application.properties
+      - DB_HOST=db # Aponta para o nome do container do banco
+      - DB_PORT=5432
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASS}
+      - PASSWORD_TOKEN_JWT=${PASSWORD_TOKEN_JWT}
+      - API_SECURITY_CORS_ALLOWED_ORIGINS=${CORS_ORIGINS}
+      
+      # Perfil do Spring Boot:
+      - SPRING_PROFILES_ACTIVE=prod
+    depends_on:
+      - db # O Java só sobe depois que o banco estiver rodando
+    networks:
+      - izi_network
 
 volumes:
   pgdata:
