@@ -2,7 +2,7 @@ services:
 # 1. SERVIÇO DO BANCO DE DADOS
   db:
     image: postgres:15-alpine
-    container_name: izi_db
+    container_name: pdv_db
     restart: unless-stopped
     environment:
       - POSTGRES_DB=${DB_NAME}
@@ -13,20 +13,20 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     networks:
-      - izi_network
+      - pdv_network
 # 2. SERVIÇO DO BACK-END
   backend:
     build:
       # Diz ao Docker para "voltar uma pasta" e procurar o Dockerfile no repositório do back-end
-      context: ../izi-pdv-back
+      context: ../pdv-chaveiro-back
       dockerfile: Dockerfile
-    container_name: izi_backend
+    container_name: pdv_backend
     restart: unless-stopped
     ports:
       - "8080:8080"
     environment:
       # Variáveis injetadas no application.properties
-      - DB_HOST=izi_db # Aponta para o nome do container do banco
+      - DB_HOST=pdv_db # Aponta para o nome do container do banco
       - DB_PORT=5432
       - DB_NAME=${DB_NAME}
       - DB_USER=${DB_USER}
@@ -39,26 +39,26 @@ services:
     depends_on:
       - db # O Java só sobe depois que o banco estiver rodando
     networks:
-      - izi_network
+      - pdv_network
 # 3. SERVIÇO DO FRONT-END
   frontend:
     build:
-      context: ../izi-pdv-front
+      context: ../pdv-chaveiro-front
       dockerfile: Dockerfile
-    container_name: izi_frontend
+    container_name: pdv_frontend
     restart: unless-stopped
     ports:
       - "80:80" # Mapeia a porta 80 do Nginx para a porta 80 local
     depends_on:
       - backend
     networks:
-      - izi_network
+      - pdv_network
 
 volumes:
   pgdata:
-    name: izi_pgdata
+    name: pdv_pgdata
 
 networks:
-  izi_network:
-    name: izi_bridge
+  pdv_network:
+    name: pdv_bridge
     driver: bridge
